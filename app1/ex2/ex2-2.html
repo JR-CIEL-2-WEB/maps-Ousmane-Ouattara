@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Markers</title>
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+  <script type="module" src="./index.js"></script>
+  <style>
+    #map {
+      height: 100vh;   /* plein écran */
+      width: 100%;     
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap&v=weekly"
+    defer></script>
+
+  <script>
+    function initMap() {
+      const myLatLng =  { lat: 48.95930033308523, lng: 2.5477890651742516 };
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: myLatLng,
+      });
+
+      const points = [
+        {lat: 48.95901659236071, lng: 2.544364368005043},
+        {lat: 48.96083250510581, lng: 2.5428194730675138},
+        {lat: 48.96334006261106, lng: 2.5503223316267305},
+        {lat: 48.96146800531762, lng: 2.553135524155863},
+        {lat: 48.95997156116078, lng: 2.548567662388221}
+      ];
+
+      // Marqueur central
+      new google.maps.Marker({
+        position: myLatLng,
+        map,
+        title: "Hello World!",
+      });
+
+      // Boucle pour ajouter tous les autres points
+      points.forEach((p, index) => {
+        new google.maps.Marker({
+          position: { lat: p.lat, lng: p.lng },
+          map,
+          title: "Point " + (index + 1)
+        });
+      });
+    }
+
+    window.initMap = initMap;
+  </script>
+</body>
+</html>

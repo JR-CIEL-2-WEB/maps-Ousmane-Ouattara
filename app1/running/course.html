@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carte — Trajets</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif}
+    #container{display:flex;height:100vh}
+    #sidebar{width:320px;min-width:240px;padding:12px;border-right:1px solid #ddd;box-sizing:border-box;overflow:auto}
+    #map{flex:1}
+    select{padding:8px 10px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer;width:100%;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="sidebar">
+      <select id="tripSelector">
+        <option value="all">-- Choisir un trajet --</option>
+      </select>
+    </div>
+    <div id="map"></div>
+  </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  let map;
+  let courses = [];
+  const polylines = [];
+  const markers = [];
+  const infoWindows = [];
+
+  // Charger les trajets
+  $.ajax({
+    url: "../ex5/courses.json",
+    dataType: "json",
+    success: function (data) {
+      courses = data.courses; // ✅ accès corrigé
+      initMap();
+    },
+    error: function (xhr, status, error) {
+      console.error("Erreur lors du chargement des trajets :", error);
+    }
+  });
+
+  // Initialiser la carte
+  function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 46.5, lng: 2.5 },
+      zoom: 6,
+      mapTypeControl: false,
+    });
+
+    drawAllCourses();
+    buildSelector();
+  }
+
+  // Dessiner toutes les courses
+  function drawAllCourses() {
+    courses.forEach((course, index) => {
+      const pathCoords = course.points.map(p => ({ lat: p.lat, lng: p.lng }));
+
+      // Trace le trajet
+      const line = new google.maps.Polyline({
+        path: pathCoords,
+        geodesic: true,
+        strokeColor: "red",
+        strokeOpacity: 0.8,
+        strokeWeight: 3,
+        map
+      });
+      polylines.push(line);
+
+      // Place les marqueurs
+      const courseMarkers = pathCoords.map((point, i) => {
+        const marker = new google.maps.Marker({
+          position: point,
+          map,
+          label: String.fromCharCode(65 + (i % 26)),
+          title: `${course.nom} - Point ${i + 1}`,
+        });
+        return marker;
+      });
+      markers.push(courseMarkers);
+
+      // Info-bulle au départ
+      const info = new google.maps.InfoWindow({
+        content: `<strong>${course.nom}</strong><br>Distance approximative : ${(pathCoords.length * 0.5).toFixed(1)} km`,
+      });
+      infoWindows.push(info);
+
+      courseMarkers[0].addListener("click", () => {
+        closeAllInfoWindows();
+        info.open(map, courseMarkers[0]);
+      });
+    });
+
+    zoomToAllCourses();
+  }
+
+  // Fermer toutes les info-bulles
+  function closeAllInfoWindows() {
+    infoWindows.forEach(iw => iw.close());
+  }
+
+  // Ajuster la vue à toutes les courses
+  function zoomToAllCourses() {
+    const bounds = new google.maps.LatLngBounds();
+    courses.forEach(course => {
+      course.points.forEach(p => bounds.extend(p));
+    });
+    map.fitBounds(bounds);
+  }
+
+  // Construire le menu déroulant
+  function buildSelector() {
+    const sel = document.getElementById("tripSelector");
+    sel.innerHTML = '<option value="all">-- Choisir un trajet --</option>';
+
+    // ✅ Afficher les vrais noms
+    courses.forEach((course, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.text = course.nom;
+      sel.appendChild(opt);
+    });
+
+    // Événement de sélection
+    sel.addEventListener("change", () => {
+      const idx = sel.value;
+      closeAllInfoWindows();
+
+      // Effacer tous les trajets précédents
+      polylines.forEach(line => line.setMap(null));
+      markers.forEach(ms => ms.forEach(m => m.setMap(null)));
+
+      if (idx === "all") {
+        drawAllCourses();
+      } else {
+        const course = courses[idx];
+        const pathCoords = course.points.map(p => ({ lat: p.lat, lng: p.lng }));
+
+        const line = new google.maps.Polyline({
+          path: pathCoords,
+          geodesic: true,
+          strokeColor: "red",
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          map
+        });
+        polylines[idx] = line;
+
+        const courseMarkers = pathCoords.map((point, i) => {
+          const marker = new google.maps.Marker({
+            position: point,
+            map,
+            label: String.fromCharCode(65 + (i % 26)),
+            title: `${course.nom} - Point ${i + 1}`,
+          });
+          return marker;
+        });
+        markers[idx] = courseMarkers;
+
+        // Zoom automatique sur la course choisie ✅
+        const bounds = new google.maps.LatLngBounds();
+        pathCoords.forEach(p => bounds.extend(p));
+        map.fitBounds(bounds);
+
+        // Ouvrir une info-bulle au départ
+        const info = new google.maps.InfoWindow({
+          content: `<strong>${course.nom}</strong><br>(${pathCoords.length} points)`,
+        });
+        info.open(map, courseMarkers[0]);
+      }
+    });
+  }
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo"></script>
+
+
+
+</body>
+</html>
