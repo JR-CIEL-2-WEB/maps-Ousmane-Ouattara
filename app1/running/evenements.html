@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier des Courses</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+          <img src="img/logo2.png" alt="Running">
+        </div>
+        <nav class="desktop-main-menu">
+          <ul>
+            <li><a href="#">Actualités</a></li>
+            <li><a href="#">Évènements</a></li>
+            <li><a href="courses.html">Courses</a></li>
+            <li><a href="carte.html">Carte</a></li>
+            <li><a href="#">Contacts</a></li>
+            <li><a href="inscription.html">S'inscire</a></li>
+            <li><a href="connexion.html">Se connecter</a></li>
+        </nav>
+      </header>
+      <div>
+
+<div class="calendar">
+    <header>
+        <h2>Calendrier des Courses</h2>
+    </header>
+    <div class="month">
+        <div class="day-header">Lun</div>
+        <div class="day-header">Mar</div>
+        <div class="day-header">Mer</div>
+        <div class="day-header">Jeu</div>
+        <div class="day-header">Ven</div>
+        <div class="day-header">Sam</div>
+        <div class="day-header">Dim</div>
+    </div>
+    <div class="week">
+        <div class="day">1</div>
+        <div class="day">2</div>
+        <div class="day">3</div>
+        <div class="day course" data-event="Marathon de Paris">4</div>
+        <div class="day">5</div>
+        <div class="day">6</div>
+        <div class="day">7</div>
+    </div>
+    <div class="week">
+        <div class="day">8</div>
+        <div class="day">9</div>
+        <div class="day course" data-event="Course de 10 km">10</div>
+        <div class="day">11</div>
+        <div class="day">12</div>
+        <div class="day">13</div>
+        <div class="day">14</div>
+    </div>
+    <div class="week">
+        <div class="day">15</div>
+        <div class="day">16</div>
+        <div class="day">17</div>
+        <div class="day">18</div>
+        <div class="day">19</div>
+        <div class="day course" data-event="Semi-marathon de Nice">20</div>
+        <div class="day">21</div>
+    </div>
+    <div class="week">
+        <div class="day">22</div>
+        <div class="day">23</div>
+        <div class="day">24</div>
+        <div class="day">25</div>
+        <div class="day">26</div>
+        <div class="day">27</div>
+        <div class="day">28</div>
+    </div>
+    <div class="week">
+        <div class="day">29</div>
+        <div class="day">30</div>
+        <div class="day">31</div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+    </div>
+</div>
+
+<div class="event-details" id="event-details">
+    <p id="event-message"></p>
+</div>
+
+<script>
+    // Script pour afficher les événements
+    const days = document.querySelectorAll('.day.course');
+    const eventDetails = document.getElementById('event-details');
+    const eventMessage = document.getElementById('event-message');
+
+    days.forEach(day => {
+        day.addEventListener('click', () => {
+            const eventName = day.getAttribute('data-event');
+            eventMessage.textContent = `Événement: ${eventName}`;
+            eventDetails.style.display = 'block';
+        });
+    });
+</script>
+
+</body>
+</html>
